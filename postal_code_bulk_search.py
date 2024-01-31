@@ -1,36 +1,22 @@
 import pandas as pd
 import requests
 import xml.etree.ElementTree as ET
+import re
 
 print("우체국우편주소 자동검색기")
 print("받는 분,주소,연락처 필드만 적어서 아래에 엑셀 파일 경로를 input 해주십시오")
 excel_file = input().replace(" ", "").replace("'", "").replace('"', '')
-service_key = 'post office api'
+service_key = 'post office api key'
 
 def address_pre(o_address):
-    split_list = ["대로", "학로", "길", "가길", "번길", "대학길", "대학로", "개로", "순환로", "산로", "로"]
-    address_full = None
-    address_detail = None
-    split_candidate = []
-    start = 0
-    for split_element in split_list:
-        if split_element in o_address:
-            while True:
-                index = o_address.find(split_element, start)
-                if index == -1:
-                    break
-                split_candidate.append(index)
-                start = index + 1
-            for split_candidate_element in split_candidate:
-                first = o_address[:split_candidate_element+1]
-                second = o_address.replace(first, "")
-                if not second.replace(" ", "")[:1].isdigit():
-                    if not second.replace(" ", "")[1:2].isdigit():
-                        continue
-                index = next((index2 for index2, char in enumerate(second.replace(" ", "")) if not char.isdigit()), None)
-                address_full = first + second[:index+1]
-                address_detail = second[index + 1:]
-                break
+    regex = r'(\w+[원,산,남,울,북,천,주,기,시,도]\s*)?' \
+            r'(\w+[구,시,군]\s*)?(\w+[구,시]\s*)?' \
+            r'(\w+[면,읍]\s*)?' \
+            r'(\w+\d*\w*[동,리,로,길]\s*\d*)' \
+            r'(\w*\d+-?\d*)?'
+    pre_address = re.search(regex, o_address)
+    address_full = pre_address.group(0)
+    address_detail = o_address.replace(address_full, "").strip()
     if address_full is None:
         address_full = o_address
         address_detail = "분리결과 없음"
