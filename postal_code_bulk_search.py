@@ -2,11 +2,13 @@ import pandas as pd
 import requests
 import xml.etree.ElementTree as ET
 import re
+import os
 
-print("우체국우편주소 자동검색기")
-print("받는 분,주소,연락처 필드만 적어서 아래에 엑셀 파일 경로를 input 해주십시오")
+print("우체국 - 우편주소 자동검색기 for Thinkgood")
+print("https://github.com/movemin03/postal_code_bulk_search")
+print("받는 분,주소,연락처 필드만 적어서 아래에 엑셀 파일 경로를 넣어주십시오")
 excel_file = input().replace(" ", "").replace("'", "").replace('"', '')
-service_key = 'post office api key'
+service_key = 'postal API S.K'
 
 def address_pre(o_address):
     regex = r'(\w+[원,산,남,울,북,천,주,기,시,도]\s*)?' \
@@ -73,12 +75,28 @@ for index, row in original_pd.iterrows():
         processed_pd = pd.concat([processed_pd, pd.DataFrame({"받는 분": [o_receiver], "우편번호": [post_num_list], "전체주소": [address_full_list], "세부주소": [address_detail_list], "휴대전화": [o_contact], "일반전화": [""]})])
     else:
         processed_pd = pd.concat([processed_pd, pd.DataFrame({"받는 분": [o_receiver], "우편번호": [post_num_list], "전체주소": [address_full_list], "세부주소": [address_detail_list], "휴대전화": [""], "일반전화": [o_contact]})])
+def get_available_filename(path):
+    base_dir = os.path.dirname(path)
+    base_name = os.path.basename(path)
+    name, ext = os.path.splitext(base_name)
+    i = 1
+    while os.path.exists(path):
+        new_name = f"{name}{i}{ext}"
+        path = os.path.join(base_dir, new_name)
+        i += 1
+    return path
 
 # processed_pd를 "가공됨.xlsx" 파일로 저장
 try:
     for column in processed_pd.columns:
         processed_pd[column] = processed_pd[column].astype(str).str.replace(r"[\[\]']", "", regex=True)
-    processed_pd.to_excel(r"C:\Users\movem\Desktop\가공.xlsx", index=False)
+    folder_path= os.path.dirname(excel_file)
+    result_path = os.path.join(folder_path, "우편번호가공.xlsx")
+    result_path = get_available_filename(result_path)
+    processed_pd.to_excel(result_path , index=False)
 except PermissionError:
     print("엑셀 파일이 열려있어서 저장할 수 없습니다")
 
+print("검색이 완료되었습니다.")
+print(result_path, " 에 저장되었습니다")
+a = input()
