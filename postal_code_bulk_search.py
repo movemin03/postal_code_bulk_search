@@ -4,11 +4,11 @@ import xml.etree.ElementTree as ET
 import re
 import os
 
-print("우체국 - 우편주소 자동검색기 for Thinkgood")
+print("우체국 - 우편주소 자동검색기")
 print("https://github.com/movemin03/postal_code_bulk_search")
 print("받는 분,주소,연락처 필드만 적어서 아래에 엑셀 파일 경로를 넣어주십시오")
-excel_file = input().replace(" ", "").replace("'", "").replace('"', '')
-service_key = 'postal API S.K'
+excel_file = input().replace("'", "").replace('"', '')
+service_key = 'api key postal'
 
 def address_pre(o_address):
     regex = r'(\w+[원,산,남,울,북,천,주,기,시,도]\s*)?' \
@@ -52,8 +52,13 @@ def postoffice(address_full):
 # original_pd 데이터프레임 생성
 try:
     original_pd = pd.read_excel(excel_file)
-except:
+except Exception as e:
+    print("엑셀 파일 인식 실패 오류입니다")
+    print(e)
     print("xls 는 불가능, xlsx 만 가능합니다")
+    print("필드명이 '받는 분','주소','연락처'인지 확인")
+    print("제공한 엑셀 파일이 사용중인 것은 아닌지 확인")
+    a = input()
 original_pd.columns = ["받는 분", "주소", "연락처"]
 
 # processed_pd 데이터프레임 생성
