@@ -10,21 +10,38 @@ print("받는 분,주소,연락처 필드만 적어서 아래에 엑셀 파일 �
 excel_file = input().replace("'", "").replace('"', '')
 service_key = 'Your_API_KEY_from_우체국'
 
+
 def address_pre(o_address):
+    # 콤마로 먼저 분리
+    base_addr = o_address
+    detail = ""
+    if ',' in o_address:
+        base_addr, detail = o_address.split(',', 1)
+        base_addr = base_addr.strip()
+
+    # 정규표현식 적용
     regex = r'(\w+[원,산,남,울,북,천,주,기,시,도]\s*)?' \
             r'(\w+[구,시,군]\s*)?(\w+[구,시]\s*)?' \
             r'(\w+[면,읍]\s*)?' \
-            r'(\w+\d*\w*[동,리,로,길]\s*\d*)' \
-            r'(\w*\d+-?\d*)?'
-    pre_address = re.search(regex, o_address)
-    address_full = pre_address.group(0)
-    address_detail = o_address.replace(address_full, "").strip()
-    if address_full is None:
-        address_full = o_address
+            r'(\w+[동,리,로,길]\s*\d+(?:-?\d+)?(?:\([^)]+\))?)'
+    r'(?=\s|$)'
+
+
+    pre_address = re.search(regex, base_addr)
+    if pre_address:
+        address_full = pre_address.group(0)
+        if detail:
+            address_detail = detail.strip()
+        else:
+            address_detail = base_addr.replace(address_full, "").strip()
+    else:
+        address_full = base_addr
         address_detail = "분리결과 없음"
+
     address_detail_list.append(address_detail)
     address_full_list.append(address_full)
     return address_full, address_detail
+
 
 def postoffice(address_full):
     uri = 'http://biz.epost.go.kr/KpostPortal/openapi2'
