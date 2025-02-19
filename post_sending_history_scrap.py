@@ -255,6 +255,7 @@ def main():
 
         # base_url로 이동
         driver.get(base_url)
+        a = input("날짜 필터를 설정한 후 엔터")
 
         # 마지막 페이지 확인
         last_page = get_last_page_number(driver)
