@@ -26,7 +26,6 @@ def address_pre(o_address):
             r'(\w+[동,리,로,길]\s*\d+(?:-?\d+)?(?:\([^)]+\))?)'
     r'(?=\s|$)'
 
-
     pre_address = re.search(regex, base_addr)
     if pre_address:
         address_full = pre_address.group(0)
@@ -38,8 +37,6 @@ def address_pre(o_address):
         address_full = base_addr
         address_detail = "분리결과 없음"
 
-    address_detail_list.append(address_detail)
-    address_full_list.append(address_full)
     return address_full, address_detail
 
 
